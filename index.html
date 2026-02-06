@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Solergy | L'Art de l'Énergie</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,200;0,400;1,200;1,400&family=Alex+Brush&family=Lora:ital,wght@0,400;1,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root {
+            --marron: #8B6F5A;
+            --kaki: #9AA18F;
+            --rose: #E6C7C2;
+            --rose-light: #f9f2f0;
+            --white: #ffffff;
+            --text-dark: #4a4a4a;
+        }
+
+        body {
+            font-family: 'Minion Variable Concept', 'Lora', serif;
+            background-color: var(--rose-light);
+            color: var(--text-dark);
+            scroll-behavior: smooth;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        h1, h2, h3, h4, .title-font {
+            font-family: 'SignPainter', 'Alex Brush', cursive;
+            font-weight: 400;
+            color: var(--marron);
+            letter-spacing: 0;
+        }
+
+        .title-hero { font-size: clamp(3rem, 10vw, 5.5rem); line-height: 0.9; }
+        .title-section { font-size: clamp(2.5rem, 6vw, 3.5rem); }
+
+        .glass {
+            background: var(--white);
+            border-bottom: none;
+        }
+
+        .nav-link {
+            font-size: 0.65rem;
+            letter-spacing: 0.2em;
+            text-transform: none;
+            font-weight: 400;
+            transition: all 0.4s ease;
+            color: var(--marron);
+            opacity: 0.5;
+            cursor: pointer;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            opacity: 1;
+        }
+
+        .navbar-logo {
+            height: 60px; /* Taille augmentée de 40px à 60px */
+            width: auto;
+            object-fit: contain;
+        }
+
+        .btn-solergy {
+            font-family: 'Lora', serif;
+            font-style: italic;
+            letter-spacing: 0.05em;
+            font-size: 0.85rem;
+            padding: 0.8rem 2.2rem;
+            transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+            border: 1px solid var(--marron);
+            background: transparent;
+            color: var(--marron);
+            border-radius: 0;
+        }
+
+        .btn-solergy:hover {
+            background: var(--marron);
+            color: var(--white);
+            transform: translateY(-2px);
+        }
+
+        .btn-rose {
+            background: var(--rose);
+            color: var(--white);
+            border: none;
+        }
+
+        .tab-content {
+            display: none;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .product-card {
+            transition: all 0.8s ease;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .line-accent {
+            width: 60px;
+            height: 1px;
+            background: var(--rose);
+            margin: 20px auto;
+        }
+
+        /* Animation de fond aesthetic */
+        @keyframes float {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            filter: blur(80px);
+            border-radius: 50%;
+            z-index: -1;
+            opacity: 0.4;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        /* Panier */
+        #cartPanel {
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 450px;
+            height: 100%; background: var(--white); z-index: 100;
+            transition: right 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            box-shadow: -20px 0 60px rgba(139, 111, 90, 0.1);
+        }
+        #cartPanel.open { right: 0; }
+        
+        #cartOverlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(139, 111, 90, 0.1); backdrop-filter: blur(8px);
+            z-index: 90; display: none;
+        }
+        #cartOverlay.open { display: block; }
+
+        .search-input {
+            background: transparent; border: none; outline: none; width: 0;
+            transition: width 0.5s ease; font-size: 0.75rem; color: var(--marron);
+            font-style: italic;
+        }
+        .search-container:hover .search-input, .search-input:focus { width: 120px; margin-left: 10px; }
+
+        .solergy-input {
+            width: 100%;
+            background: transparent;
+            border-bottom: 1px solid rgba(139, 111, 90, 0.2);
+            padding: 0.75rem 0;
+            outline: none;
+            font-size: 0.9rem;
+            transition: border-color 0.4s ease;
+        }
+        .solergy-input:focus { border-color: var(--marron); }
+        .solergy-label { font-size: 0.65rem; text-transform: none; opacity: 0.4; }
+
+        .article-body p { line-height: 2; margin-bottom: 2rem; font-weight: 300; }
+        
+        /* Harmonisation de la taille des photos : format carré pour tout le monde */
+        .product-detail-carousel { width: 100%; aspect-ratio: 1 / 1; position: relative; overflow: hidden; border-radius: 2rem; }
+        .carousel-track { display: flex; transition: transform 0.8s cubic-bezier(0.19, 1, 0.22, 1); height: 100%; }
+        .carousel-slide { min-width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; }
+        .carousel-btn { position: absolute; top: 50%; transform: translateY(-50%); background: white; width: 40px; height: 40px; display: flex; items-center justify-center; border-radius: 50%; shadow-sm; z-index: 10; }
+
+        .star-active { fill: var(--kaki); color: var(--kaki); }
+
+        .text-text-dark { color: var(--text-dark); }
+    </style>
+</head>
+<body>
+
+    <div id="cartOverlay" onclick="toggleCart()"></div>
+
+    <!-- MODAL AVIS -->
+    <div id="reviewModal" class="fixed inset-0 z-[200] hidden items-center justify-center p-6 bg-marron/5 backdrop-blur-xl">
+        <div class="bg-white w-full max-w-xl p-12 relative shadow-2xl rounded-[30px]">
+            <button onclick="toggleReviewModal()" class="absolute top-8 right-8 opacity-20 hover:opacity-100"><i data-lucide="x"></i></button>
+            <h2 class="title-font text-5xl mb-10 text-center">Partager votre douceur</h2>
+            <form id="reviewForm" onsubmit="submitReview(event)" class="space-y-8">
+                <div class="flex justify-center space-x-3" id="starSelector">
+                    <i data-lucide="star" class="w-6 h-6 text-gray-200 cursor-pointer" onclick="setRating(1)"></i>
+                    <i data-lucide="star" class="w-6 h-6 text-gray-200 cursor-pointer" onclick="setRating(2)"></i>
+                    <i data-lucide="star" class="w-6 h-6 text-gray-200 cursor-pointer" onclick="setRating(3)"></i>
+                    <i data-lucide="star" class="w-6 h-6 text-gray-200 cursor-pointer" onclick="setRating(4)"></i>
+                    <i data-lucide="star" class="w-6 h-6 text-gray-200 cursor-pointer" onclick="setRating(5)"></i>
+                </div>
+                <div class="grid grid-cols-2 gap-8">
+                    <div class="space-y-2"><label class="solergy-label">Votre Nom</label><input type="text" id="revName" required class="solergy-input"></div>
+                    <div class="space-y-2"><label class="solergy-label">Votre Ville</label><input type="text" id="revLoc" required class="solergy-input"></div>
+                </div>
+                <div class="space-y-2"><label class="solergy-label">Votre expérience</label><textarea id="revMsg" rows="3" required class="solergy-input resize-none"></textarea></div>
+                <button type="submit" class="btn-solergy w-full btn-rose py-4 rounded-full">Envoyer mon message</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PANIER -->
+    <div id="cartPanel" class="flex flex-col">
+        <div class="p-8 flex justify-between items-center border-b border-marron/5">
+            <h2 class="title-font text-3xl">Mon Panier</h2>
+            <button onclick="toggleCart()"><i data-lucide="x" class="w-5 h-5 opacity-20"></i></button>
+        </div>
+        <div id="cartItemsList" class="flex-grow overflow-y-auto p-8 space-y-8 no-scrollbar">
+            <p class="text-[11px] uppercase tracking-widest opacity-30 text-center py-20 italic">Aucun trésor sélectionné.</p>
+        </div>
+        <div class="p-8 bg-rose-light border-t border-marron/5 space-y-6">
+            <div class="flex justify-between items-center title-font text-2xl">
+                <span>Total</span><span id="cartTotal">0€</span>
+            </div>
+            <button onclick="showPage('checkout'); toggleCart();" class="btn-solergy w-full btn-rose py-5 rounded-full">Valider ma commande</button>
+        </div>
+    </div>
+
+    <!-- NAVIGATION (Compacte avec Logo) -->
+    <nav class="fixed top-0 w-full z-50 glass py-4 px-8 md:px-16 flex justify-between items-center" id="navbar">
+        <div class="cursor-pointer flex items-center" onclick="showPage('home')">
+            <img src="Capture d’écran 2026-02-05 à 16.57.30 18.59.38.jpg" alt="Solergy" class="navbar-logo">
+        </div>
+        <div class="hidden lg:flex space-x-12">
+            <span onclick="showPage('home')" class="nav-link nav-item active" id="nav-home">Accueil</span>
+            <span onclick="showPage('products')" class="nav-link nav-item" id="nav-products">Boutique</span>
+            <span onclick="showPage('about')" class="nav-link nav-item" id="nav-about">L'Histoire</span>
+            <span onclick="showPage('reviews')" class="nav-link nav-item" id="nav-reviews">Avis</span>
+            <span onclick="showPage('blog')" class="nav-link nav-item" id="nav-blog">Journal</span>
+            <span onclick="showPage('contact')" class="nav-link nav-item" id="nav-contact">Contact</span>
+        </div>
+        <div class="flex items-center space-x-8">
+            <div class="search-container flex items-center">
+                <i data-lucide="search" class="w-4 h-4 opacity-30"></i>
+                <input type="text" placeholder="Inspiration..." class="search-input" onkeypress="handleSearch(event)">
+            </div>
+            <button onclick="toggleCart()" class="relative group">
+                <i data-lucide="shopping-bag" class="w-5 h-5 text-[#8B6F5A] opacity-60 group-hover:opacity-100 transition-opacity"></i>
+                <span id="cartBadge" class="absolute -top-1.5 -right-1.5 text-[8px] bg-[#8B6F5A] text-white w-4 h-4 rounded-full flex items-center justify-center hidden z-10">0</span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- PAGE: ACCUEIL -->
+    <main id="home" class="tab-content active overflow-hidden">
+        <section class="min-h-screen flex items-center justify-center px-10 relative">
+            <div class="blob bg-[#E6C7C2] top-[-10%] left-[-10%]" style="animation-delay: 0s;"></div>
+            <div class="blob bg-[#9AA18F] bottom-[0%] right-[-10%]" style="animation-delay: -5s;"></div>
+            <div class="blob bg-[#8B6F5A] top-[20%] right-[10%]" style="animation-delay: -10s; opacity: 0.2;"></div>
+
+            <div class="container mx-auto z-10 max-w-6xl pt-20 grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                <div class="space-y-12 text-left">
+                    <div class="space-y-6">
+                        <span class="text-[12px] uppercase tracking-[0.8em] font-light text-kaki">Douceur & Performance</span>
+                        <h1 class="title-hero">Le secret d'un <br> <span class="text-rose italic">équilibre pur</span>.</h1>
+                    </div>
+                    <p class="text-lg font-light max-w-xl opacity-60 leading-loose italic">
+                        L’excellence de la nutrition au service de votre sérénité. Des ingrédients sélectionnés pour leur pureté, une approche sensorielle de l'énergie.
+                    </p>
+                    <div class="pt-8">
+                        <button onclick="showPage('products')" class="btn-solergy btn-rose shadow-xl rounded-full">Explorer la collection</button>
+                    </div>
+                </div>
+                <div class="flex justify-center lg:justify-end">
+                    <img src="Gemini_Generated_Image_jgkk33jgkk33jgkk.jpg" alt="Solergy Gummies" class="w-full max-w-xl h-auto object-contain drop-shadow-2xl rounded-[40px]">
+                </div>
+            </div>
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-30 animate-bounce">
+                <i data-lucide="chevron-down" class="w-6 h-6 text-marron"></i>
+            </div>
+        </section>
+
+        <section class="py-40 bg-white">
+            <div class="container mx-auto px-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-32 items-center">
+                    <div class="flex justify-center">
+                        <img src="Gemini_Generated_Image_4noj8z4noj8z4noj.jpg" alt="Solergy Vision" class="max-h-[500px] w-auto object-contain shadow-2xl rounded-[40px]">
+                    </div>
+                    <div class="space-y-12">
+                        <div class="space-y-4">
+                            <span class="text-[10px] tracking-[0.5em] uppercase text-marron opacity-50">Notre Philosophie</span>
+                            <h2 class="title-section">L'énergie <span class="italic text-rose">réinventée</span></h2>
+                        </div>
+                        <p class="text-base font-light opacity-60 leading-loose italic">
+                            Nous croyons que la performance ne devrait jamais se faire au détriment du bien-être. Solergy fusionne la rigueur scientifique avec la sensorialité, créant ainsi des alliés quotidiens qui nourrissent votre corps et apaisent votre esprit.
+                        </p>
+                        <div class="flex items-center space-x-6 opacity-40">
+                            <div class="h-[1px] w-20 bg-marron"></div>
+                            <span class="text-[10px] uppercase tracking-widest">Maison de Performance Sensorielle</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="py-40 bg-rose-light">
+            <div class="container mx-auto px-10 text-center max-w-3xl">
+                <div class="space-y-16">
+                    <h2 class="title-font text-6xl italic text-marron">"L’énergie qui se savoure."</h2>
+                    <div class="line-accent"></div>
+                    <p class="text-sm font-light opacity-60 leading-relaxed italic">
+                        Chaque formule Solergy est une promesse d'exigence. Sans additifs inutiles, nos produits sont conçus pour s'intégrer harmonieusement à votre rythme de vie, vous offrant une clarté d'esprit et une vitalité durable.
+                    </p>
+                    <button onclick="showPage('about')" class="nav-link border-b border-marron/20 pb-2">Découvrir notre histoire</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- PAGE: PRODUITS -->
+    <main id="products" class="tab-content pt-28 pb-20">
+        <div class="container mx-auto px-10">
+            <div class="text-center mb-24 space-y-4">
+                <h1 class="title-section">L'Édition <span class="text-rose">Précieuse</span></h1>
+                <div class="line-accent"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16">
+                <!-- Gummies -->
+                <div class="product-card bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl space-y-8 group cursor-pointer" onclick="showProductDetail('gummies')">
+                    <div class="aspect-square overflow-hidden shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="Gemini_Generated_Image_2ajfbd2ajfbd2ajf 18.59.38.jpg" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 rounded-[30px]">
+                    </div>
+                    <div class="text-center space-y-3">
+                        <h3 class="title-font text-4xl text-white">Gummies</h3>
+                        <p class="text-[10px] tracking-[0.2em] opacity-70">Or & Cacao • Soin quotidien</p>
+                        <p class="text-xl font-light text-white">39€</p>
+                        <span class="text-[10px] border-b border-white/30 pb-1">En savoir plus</span>
+                    </div>
+                </div>
+
+                <!-- Barres -->
+                <div class="product-card bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl space-y-8 group cursor-pointer" onclick="showProductDetail('barres')">
+                    <div class="aspect-square overflow-hidden shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="Gemini_Generated_Image_hd1qodhd1qodhd1q.jpg" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 rounded-[30px]">
+                    </div>
+                    <div class="text-center space-y-3">
+                        <h3 class="title-font text-4xl text-white">Barres</h3>
+                        <p class="text-[10px] tracking-[0.2em] opacity-70">Duo Essentiel • Énergie Pure</p>
+                        <p class="text-xl font-light text-white">7€</p>
+                        <span class="text-[10px] border-b border-white/30 pb-1">En savoir plus</span>
+                    </div>
+                </div>
+
+                <!-- Elixirs -->
+                <div class="product-card bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl space-y-8 group cursor-pointer" onclick="showProductDetail('elixirs')">
+                    <div class="aspect-square overflow-hidden shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="Gemini_Generated_Image_4dsp8g4dsp8g4dsp.jpg" class="w-full h-full object-cover grayscale-[20%] group-hover:grayscale-0 transition-all duration-1000 rounded-[30px]">
+                    </div>
+                    <div class="text-center space-y-3">
+                        <h3 class="title-font text-4xl text-white">Élixirs</h3>
+                        <p class="text-[10px] uppercase tracking-[0.2em] opacity-70">Botanique & Vitalité • Pack de 6</p>
+                        <p class="text-xl font-light text-white">24€</p>
+                        <span class="text-[10px] border-b border-white/30 pb-1">En savoir plus</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-32 max-w-3xl mx-auto text-center space-y-10 bg-white p-16 shadow-sm border border-rose/5 rounded-[40px]">
+                <h3 class="title-font text-4xl">La performance commence par l’équilibre</h3>
+                <div class="text-sm font-light opacity-60 leading-loose italic space-y-6">
+                    <p>Nos produits ont été conçus pour répondre à des besoins précis, sans excès ni compromis.</p>
+                    <p>Des formules clean, aux dosages maîtrisés, pensées pour soutenir l’énergie, favoriser la récupération ou apaiser le mental.</p>
+                    <p class="text-rose text-lg">Parce que vous méritez l'excellence.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- PAGE: DÉTAIL -->
+    <main id="product-detail" class="tab-content pt-28 pb-20">
+        <div class="container mx-auto px-10">
+            <button onclick="showPage('products')" class="flex items-center space-x-3 text-[10px] opacity-30 hover:opacity-100 mb-12 transition-all">
+                <i data-lucide="arrow-left" class="w-4 h-4"></i><span>Retour à la Boutique</span>
+            </button>
+            <div id="productDetailContent" class="grid grid-cols-1 lg:grid-cols-2 gap-20 items-start"></div>
+        </div>
+    </main>
+
+    <!-- PAGE: HISTOIRE -->
+    <main id="about" class="tab-content">
+        <!-- Hero Immersif sans contour ni bordure -->
+        <section class="min-h-screen relative flex items-center px-10 overflow-hidden w-full">
+            <!-- Image de fond prenant tout l'espace haut avec focus sur les têtes (object-top) -->
+            <div class="absolute inset-0 z-0">
+                <img src="Gemini_Generated_Image_1brrtt1brrtt1brr.jpg" alt="Vision Solergy" class="w-full h-full object-cover object-top">
+                <!-- Voile Kaki semi-transparent -->
+                <div class="absolute inset-0 bg-[#9AA18F]/60 backdrop-blur-[1px]"></div>
+            </div>
+
+            <div class="container mx-auto z-10 text-left pt-20">
+                <div class="space-y-8 max-w-2xl">
+                    <div class="space-y-3">
+                        <span class="text-[10px] tracking-[0.8em] uppercase text-white/90 font-light">Notre Signature</span>
+                        <h2 class="title-section italic text-white">Notre <span class="italic">vision</span></h2>
+                    </div>
+                    <div class="text-base font-light text-white opacity-90 leading-[2.2] space-y-8 italic">
+                        <p>Nous avons voulu repenser l’énergie et la performance à travers une approche plus consciente, plus désirable et plus responsable.</p>
+                        <p>Parce que prendre un complément ne devrait ni être contraignant, ni excessif, ni deconnecté du plaisir. Notre marque s’adresse à celles et ceux qui veulent aller plus loin, sans compromettre leur équilibre.</p>
+                        <p class="text-5xl title-font text-rose mt-8">L’énergie qui se savoure.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute bottom-10 left-1/2 transform -translate-x-1/2 opacity-50 animate-bounce z-10">
+                <i data-lucide="chevron-down" class="w-6 h-6 text-white"></i>
+            </div>
+        </section>
+
+        <!-- Contenu sous la bannière -->
+        <div class="container mx-auto px-4 md:px-10 max-w-6xl mt-32 pb-20">
+            <div class="space-y-32">
+                <section class="grid grid-cols-1 md:grid-cols-2 gap-24 items-start">
+                    <div class="space-y-10">
+                        <h3 class="title-font text-4xl italic">Des produits pensés comme des rituels</h3>
+                        <div class="text-sm font-light opacity-60 leading-loose italic space-y-6">
+                            <p>Nous accompagnons chaque moment clé de l’effort : préparer le corps et l’esprit, soutenir l’énergie, puis favoriser la récupération.</p>
+                            <p>Nos gummies transforment un geste fonctionnel en un véritable rituel. Faciles à consommer, élégants et sensoriels, ils s’intègrent naturellement dans le quotidien des personnes actives et sportives.</p>
+                        </div>
+                        <ul class="space-y-4 text-[10px] uppercase tracking-widest text-marron opacity-60">
+                            <li class="flex items-center space-x-3"><i data-lucide="check" class="w-3 h-3"></i><span>Énergie physique</span></li>
+                            <li class="flex items-center space-x-3"><i data-lucide="check" class="w-3 h-3"></i><span>Récupération</span></li>
+                            <li class="flex items-center space-x-3"><i data-lucide="check" class="w-3 h-3"></i><span>Anti-stress (pré-compétition)</span></li>
+                        </ul>
+                    </div>
+                    <div class="space-y-10">
+                        <h3 class="title-font text-4xl italic">Une conception maîtrisée</h3>
+                        <div class="text-sm font-light opacity-60 leading-loose italic space-y-6">
+                            <p>Chaque produit est conçu avec exigence, selon un principe simple : faire mieux, sans en faire trop. Nos formules privilégient l’efficacité, des dosages maîtrisés et une énergie progressive, loin des excès des compléments traditionnels.</p>
+                            <p>Les gummies translucides, ponctués de subtils éclats de cacao, sont présentés dans des écrins premium, pensés comme de véritables objets de désir.</p>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="py-24 border-y border-marron/5 text-center space-y-12">
+                    <div class="max-w-2xl mx-auto space-y-8">
+                        <h3 class="title-font text-4xl italic">Des ingrédients sélectionnés avec soin</h3>
+                        <p class="text-base font-light opacity-60 italic leading-relaxed">Nous choisissons des ingrédients reconnus pour leur qualité et leur utilité : sources d’énergie naturelles, vitamines et minéraux essentiels, actifs favorisant la récupération et la gestion du stress. Chaque ingrédient a un rôle précis. Aucun superflu, aucun compromis.</p>
+                    </div>
+                </section>
+
+                <section class="text-center space-y-12">
+                    <h3 class="title-section italic">Une nouvelle approche de l’énergie</h3>
+                    <p class="text-lg font-light opacity-60 max-w-3xl mx-auto italic leading-loose">Nous croyons en une énergie plus juste, plus respectueuse du corps et de l’esprit. Une énergie qui accompagne le mouvement, sans jamais le brusquer.</p>
+                </section>
+            </div>
+        </div>
+    </main>
+
+    <!-- PAGE: AVIS -->
+    <main id="reviews" class="tab-content pt-28 pb-20">
+        <div class="container mx-auto px-10 max-w-6xl text-center">
+            <h1 class="title-section mb-20">Mots de <span class="italic text-rose">Douceur</span></h1>
+            <div id="reviewsList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 text-left">
+                <div class="p-8 border border-marron/5 bg-white/50 space-y-6 rounded-[30px]">
+                    <div class="flex space-x-1">
+                        <i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i>
+                    </div>
+                    <p class="text-sm font-light italic opacity-60 leading-loose">"Une expérience sensorielle unique. Les gummies sont devenus mon petit plaisir matinal indispensable."</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-rose rounded-full flex items-center justify-center title-font text-white text-2xl">C</div>
+                        <div><p class="title-font text-2xl">Claire D.</p><p class="text-[9px] opacity-30">Paris</p></div>
+                    </div>
+                </div>
+                <div class="p-8 border border-marron/5 bg-white/50 space-y-6 rounded-[30px]">
+                    <div class="flex space-x-1">
+                        <i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i>
+                    </div>
+                    <p class="text-sm font-light italic opacity-60 leading-loose">"Enfin un boost d'énergie qui ne donne pas de palpitations. Le goût chocolat-cacao est sublime."</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-kaki rounded-full flex items-center justify-center title-font text-white text-2xl">M</div>
+                        <div><p class="title-font text-2xl">Mélanie L.</p><p class="text-[9px] opacity-30">Lyon</p></div>
+                    </div>
+                </div>
+                <div class="p-8 border border-marron/5 bg-white/50 space-y-6 rounded-[30px]">
+                    <div class="flex space-x-1">
+                        <i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 opacity-20"></i>
+                    </div>
+                    <p class="text-sm font-light italic opacity-60 leading-loose">"L'écrin est tellement beau qu'on a presque peur de l'ouvrir. Les effets sur la récupération sont bien là."</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-rose rounded-full flex items-center justify-center title-font text-white text-2xl">S</div>
+                        <div><p class="title-font text-2xl">Sophie V.</p><p class="text-[9px] opacity-30">Bordeaux</p></div>
+                    </div>
+                </div>
+                <div class="p-8 border border-marron/5 bg-white/50 space-y-6 rounded-[30px]">
+                    <div class="flex space-x-1">
+                        <i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i><i data-lucide="star" class="w-4 h-4 star-active"></i>
+                    </div>
+                    <p class="text-sm font-light italic opacity-60 leading-loose">"Un indispensable pour mes longues journées de travail. Une clarté d'esprit immédiate."</p>
+                    <div class="flex items-center space-x-4">
+                        <div class="w-10 h-10 bg-marron rounded-full flex items-center justify-center title-font text-white text-2xl">T</div>
+                        <div><p class="title-font text-2xl">Tessa B.</p><p class="text-[9px] opacity-30">Genève</p></div>
+                    </div>
+                </div>
+            </div>
+            <button onclick="toggleReviewModal()" class="btn-solergy mt-20 px-12 rounded-full">Rédiger un témoignage</button>
+        </div>
+    </main>
+
+    <!-- PAGE: JOURNAL -->
+    <main id="blog" class="tab-content">
+        <div id="blogGrid" class="pt-28 pb-20 container mx-auto px-10">
+            <div class="text-center mb-20">
+                <h1 class="title-section">Le <span class="italic text-rose">Journal</span></h1>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-12 items-start">
+                <article class="bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl cursor-pointer group" onclick="showArticle('formulation')">
+                    <div class="aspect-square overflow-hidden bg-white mb-8 shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="labo 18.59.38.jpg" class="max-w-full max-h-full object-contain transition-all duration-1000 grayscale group-hover:grayscale-0 rounded-[30px]">
+                    </div>
+                    <h2 class="title-font text-4xl leading-tight text-center italic text-white">Ici, tout commence sur une table de formulation</h2>
+                    <p class="text-[10px] text-center mt-4 border-b border-white/20 pb-2">Découvrir le secret de fabrication</p>
+                </article>
+
+                <article class="bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl cursor-pointer group" onclick="showArticle('cacao')">
+                    <div class="aspect-square overflow-hidden bg-white mb-8 shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="7f0ac084359702ecc3410bdf47c37dd3.jpg" class="max-w-full max-h-full object-cover transition-all duration-1000 grayscale group-hover:grayscale-0 rounded-[30px]">
+                    </div>
+                    <h2 class="title-font text-4xl leading-tight text-center italic text-white">Le Cacao Cru : L'Or Noir de nos Gummies</h2>
+                    <p class="text-[10px] text-center mt-4 border-b border-white/20 pb-2">Une fusion de plaisir et de vitalité</p>
+                </article>
+
+                <article class="bg-[var(--kaki)] p-8 rounded-[40px] text-white shadow-xl cursor-pointer group" onclick="showArticle('rituel')">
+                    <div class="aspect-square overflow-hidden bg-white mb-8 shadow-sm flex items-center justify-center rounded-[30px]">
+                        <img src="Gemini_Generated_Image_4noj8z4noj8z4noj.jpg" class="w-full h-full object-cover transition-all duration-1000 grayscale group-hover:grayscale-0 rounded-[30px]">
+                    </div>
+                    <h2 class="title-font text-4xl leading-tight text-center italic text-white">Sérénité Active : L'Art du Mouvement Conscient</h2>
+                    <p class="text-[10px] text-center mt-4 border-b border-white/20 pb-2">Équilibrer l'esprit au quotidien</p>
+                </article>
+            </div>
+        </div>
+        
+        <!-- DÉTAIL ARTICLE IMMERSIF -->
+        <div id="blogDetail" class="hidden">
+            <!-- Hero de l'article plein écran -->
+            <section class="min-h-screen relative flex items-center px-10 overflow-hidden w-full">
+                <div class="absolute inset-0 z-0">
+                    <img id="blogDetailImg" src="" alt="Article Image" class="w-full h-full object-cover">
+                    <!-- Voile Kaki semi-transparent -->
+                    <div class="absolute inset-0 bg-[#9AA18F]/60 backdrop-blur-[1px]"></div>
+                </div>
+                <div class="container mx-auto z-10 text-left pt-20">
+                    <div class="space-y-12 max-w-4xl">
+                        <button onclick="closeArticle()" class="flex items-center space-x-3 text-[10px] uppercase tracking-widest text-white opacity-60 hover:opacity-100 transition-all"><i data-lucide="arrow-left" class="w-4 h-4"></i><span>Retour au journal</span></button>
+                        <h1 id="blogDetailTitle" class="title-font text-6xl italic text-white leading-tight"></h1>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Corps de l'article -->
+            <div id="blogDetailContent" class="container mx-auto px-4 md:px-10 max-w-4xl py-32 article-body italic text-text-dark">
+            </div>
+        </div>
+    </main>
+
+    <!-- PAGE: CONTACT -->
+    <main id="contact" class="tab-content pt-28 pb-20 text-center">
+        <div class="container mx-auto px-10 max-w-3xl">
+            <h1 class="title-section mb-12">Votre <span class="italic text-rose">Conciergerie</span></h1>
+            <p class="text-sm font-light opacity-50 mb-16 italic">Une demande, un conseil ou une attention particulière ? Nous vous répondons avec soin.</p>
+            <form onsubmit="event.preventDefault(); alert('Votre demande a bien été transmise.');" class="space-y-12 text-left">
+                <div class="space-y-2"><label class="solergy-label">Nom complet</label><input type="text" required class="solergy-input italic"></div>
+                <div class="space-y-2"><label class="solergy-label">Email</label><input type="email" required class="solergy-input italic"></div>
+                <div class="space-y-2"><label class="solergy-label">Message</label><textarea rows="3" required class="solergy-input italic resize-none"></textarea></div>
+                <button type="submit" class="btn-solergy w-full btn-rose py-4 shadow-xl rounded-full">Transmettre</button>
+            </form>
+        </div>
+    </main>
+
+    <!-- PAGE: CHECKOUT (PAIEMENT) -->
+    <main id="checkout" class="tab-content pt-28 pb-20">
+        <div class="container mx-auto px-10 max-w-4xl">
+            <div class="bg-white p-12 md:p-20 rounded-[50px] shadow-2xl space-y-16">
+                <div class="text-center space-y-4">
+                    <h1 class="title-section">Finaliser votre <span class="text-rose">commande</span></h1>
+                    <div class="line-accent"></div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
+                    <!-- Informations de Livraison -->
+                    <div class="space-y-8">
+                        <h3 class="title-font text-3xl italic">Livraison</h3>
+                        <div class="space-y-6">
+                            <div class="space-y-2"><label class="solergy-label">Adresse complète</label><input type="text" placeholder="12 rue de l'Escrin" class="solergy-input italic"></div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2"><label class="solergy-label">Code Postal</label><input type="text" placeholder="75000" class="solergy-input italic"></div>
+                                <div class="space-y-2"><label class="solergy-label">Ville</label><input type="text" placeholder="Paris" class="solergy-input italic"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Paiement -->
+                    <div class="space-y-8">
+                        <h3 class="title-font text-3xl italic">Paiement Sécurisé</h3>
+                        <div class="space-y-6">
+                            <div class="space-y-2">
+                                <label class="solergy-label">Numéro de carte</label>
+                                <div class="relative">
+                                    <input type="text" placeholder="0000 0000 0000 0000" class="solergy-input italic pr-10">
+                                    <i data-lucide="credit-card" class="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 opacity-30"></i>
+                                </div>
+                            </div>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div class="space-y-2"><label class="solergy-label">Expiration</label><input type="text" placeholder="MM/AA" class="solergy-input italic"></div>
+                                <div class="space-y-2"><label class="solergy-label">CVV</label><input type="password" placeholder="***" class="solergy-input italic"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-12 border-t border-marron/5 flex flex-col items-center space-y-8">
+                    <div class="flex justify-between w-full max-w-sm title-font text-3xl">
+                        <span>Total à régler</span><span id="checkoutTotal">0€</span>
+                    </div>
+                    <button onclick="finalizeOrder()" class="btn-solergy btn-rose w-full max-w-md py-5 rounded-full shadow-xl">Procéder au règlement</button>
+                    <p class="text-[9px] opacity-30 italic flex items-center gap-2"><i data-lucide="lock" class="w-2 h-2"></i> Transactions cryptées et sécurisées par Solergy Maison</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- FOOTER (Compact) -->
+    <footer class="bg-white text-text-dark pt-12 pb-6 border-t border-marron/5 rounded-t-[40px]">
+        <div class="container mx-auto px-10">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-16 mb-12 items-start">
+                <div class="title-font text-4xl italic">Solergy</div>
+                <div class="flex space-x-12 text-[9px] font-light opacity-40">
+                    <ul class="space-y-4">
+                        <li onclick="showPage('about')" class="cursor-pointer hover:text-rose">L'Histoire</li>
+                        <li onclick="showPage('products')" class="cursor-pointer hover:text-rose">La Collection</li>
+                    </ul>
+                    <ul class="space-y-4">
+                        <li class="cursor-pointer hover:text-rose">Mentions</li>
+                        <li class="cursor-pointer hover:text-rose">CGV</li>
+                    </ul>
+                </div>
+                <div class="space-y-6">
+                    <p class="text-[9px] uppercase font-light opacity-40">La Newsletter</p>
+                    <div class="flex border-b border-marron/10 py-2">
+                        <input type="email" placeholder="E-mail" class="bg-transparent outline-none text-[10px] w-full italic">
+                        <button class="hover:text-rose"><i data-lucide="arrow-right" class="w-4 h-4 opacity-40"></i></button>
+                    </div>
+                </div>
+            </div>
+            <div class="text-center pt-8 opacity-20 text-[8px] border-t border-marron/5 font-light">
+                &copy; 2026 Solergy • Maison de Performance Sensorielle
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        lucide.createIcons();
+
+        const products = {
+            gummies: {
+                id: 'gummies', title: 'Gummies', subtitle: 'Éclats d\'or & chocolat noir', price: 39,
+                desc: 'Une fusion précieuse entre haute nutrition et sensorialité. Enrichis d\'éclats de cacao et de particules d\'or biodisponibles, nos gummies offrent une énergie stable et une clarté d\'esprit remarquable.',
+                images: [
+                    'Gemini_Generated_Image_2ajfbd2ajfbd2ajf 18.59.38.jpg',
+                    'Gemini_Generated_Image_1uv7cz1uv7cz1uv7 18.59.38.jpg',
+                    'Gemini_Generated_Image_8dc3z78dc3z78dc3 18.59.38.jpg',
+                    'Gemini_Generated_Image_xatzyexatzyexatz 18.59.38.jpg',
+                    'Gemini_Generated_Image_jgkk33jgkk33jgkk.jpg'
+                ]
+            },
+            barres: {
+                id: 'barres', title: 'Barres', subtitle: 'Vitalité & récupération musculaire', price: 7,
+                desc: 'Conçues pour les moments d\'effort intense, ces barres allient force nutritionnelle et douceur gustative.',
+                images: [
+                    'Gemini_Generated_Image_hd1qodhd1qodhd1q.jpg',
+                    'Capture d’écran 2026-02-05 à 18.12.06.jpg',
+                    'Capture d’écran 2026-02-05 à 18.12.17.jpg',
+                    'Capture d’écran 2026-02-05 à 18.12.26.jpg'
+                ]
+            },
+            elixirs: {
+                id: 'elixirs', title: 'Élixirs', subtitle: 'Concentré de botanique pure', price: 24,
+                desc: 'Un élixir rare formulé pour une absorption ultra-rapide.',
+                images: [
+                    'Gemini_Generated_Image_4dsp8g4dsp8g4dsp.jpg',
+                    'Gemini_Generated_Image_zp8wzp8wzp8wzp8w.jpg',
+                    'Capture d’écran 2026-02-05 à 18.12.38.jpg'
+                ]
+            }
+        };
+
+        const blogArticles = {
+            formulation: {
+                title: "Ici, tout commence sur une table de formulation",
+                img: "labo 18.59.38.jpg",
+                content: `
+                    <h1 class="title-font text-4xl mb-8 italic text-marron">Ici, tout commence sur une table de formulation</h1>
+                    <p class="text-lg opacity-70 mb-10 leading-relaxed">Avant d’être des produits finis, nos gummies sont d’abord des feuilles de calcul, des essais de texture, des lots pilotes et des ajustements millimétrés.</p>
+                    <p>Dans notre unité de fabrication, chaque formule est travaillée avec la même exigence : obtenir un produit efficace, stable, agréable à consommer, sans jamais surcharger l’organisme.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">La formulation : précision avant performance</h3>
+                    <p>Chaque recette débute par une base simple et contrôlée. Nous utilisons un agent gélifiant d’origine naturelle, associé à une source de glucides sélectionnée pour sa stabilité et son index glycémique modéré, comme le sirop de tapioca. Sur cette base, nous intégrons les actifs fonctionnels un à un.</p>
+                    <p>Par exemple, pour notre gamme Énergie physique, nous travaillons avec :</p>
+                    <ul class="space-y-4 mb-8 text-sm border-l border-rose/20 pl-6">
+                        <li>• de la caféine d’origine naturelle issue du guarana ou du thé vert,</li>
+                        <li>• des vitamines B6 et B12, reconnues pour leur rôle dans le métabolisme énergétique.</li>
+                    </ul>
+                    <p>Les dosages sont volontairement modérés. L’objectif n’est pas de créer un pic d’excitation, mais une énergie progressive, mieux tolérée.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Intégrer les actifs sans les dégrader</h3>
+                    <p>Certains ingrédients sont sensibles à la chaleur. C’est pourquoi, sur nos lignes de production, les températures et les temps de cuisson sont strictement contrôlés. Les vitamines et les extraits végétaux sont ajoutés à des moments précis du process, afin de préserver leur efficacité. Chaque ajout est vérifié, tracé et validé avant le passage à l’étape suivante.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Le cacao : un détail qui n’en est pas un</h3>
+                    <p>Les éclats de cacao que vous observez dans nos gummies ne sont pas décoratifs par hasard. Ils sont intégrés en toute fin de fabrication, à froid, pour préserver :</p>
+                    <ul class="space-y-4 mb-8 text-sm border-l border-rose/20 pl-6">
+                        <li>• leurs propriétés antioxydantes,</li>
+                        <li>• leur texture,</li>
+                        <li>• et leur aspect visuel.</li>
+                    </ul>
+                    <p>Chaque lot est mélangé délicatement afin que les éclats restent visibles et répartis de façon homogène, sans altérer la structure du gummy.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Textures, formes et régularité</h3>
+                    <p>Une fois la formulation validée, la masse est coulée dans des moules spécifiques. La forme du gummy a été travaillée pour garantir :</p>
+                    <ul class="space-y-4 mb-8 text-sm border-l border-rose/20 pl-6">
+                        <li>• une mastication agréable,</li>
+                        <li>• une libération progressive,</li>
+                        <li>• une prise facile, sans sensation collante.</li>
+                    </ul>
+                    <p>Après démoulage, les gummies passent par une phase de stabilisation, indispensable pour assurer leur tenue dans le temps.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Contrôles et traçabilité</h3>
+                    <p>À chaque étape, des contrôles sont réalisés :</p>
+                    <ul class="space-y-4 mb-8 text-sm border-l border-rose/20 pl-6">
+                        <li>• poids,</li>
+                        <li>• homogénéité,</li>
+                        <li>• texture,</li>
+                        <li>• conformité des dosages.</li>
+                    </ul>
+                    <p>Chaque lot est identifié, suivi et archivé. Cette traçabilité nous permet de garantir la constance des produits, d’un écrin à l’autre.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Fabriquer proprement, fabriquer responsable</h3>
+                    <p>Produire clean, c’est limiter les additifs inutiles, ajuster les volumes pour éviter le gaspillage et travailler avec des partenaires respectant des standards stricts de qualité et d’hygiène. Rien n’est laissé au hasard, parce que ce que vous consommez engage notre responsabilité.</p>
+
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Ce que nous fabriquons, au fond</h3>
+                    <p>Dans cette unité de fabrication, nous ne cherchons pas à produire plus fort. Nous cherchons à produire plus juste. Des produits conçus pour accompagner le corps, sans le brusquer. Des formules maîtrisées, pensées pour s’intégrer naturellement à votre rythme. C’est ici que prend forme notre idée de l’énergie.</p>
+
+                    <div class="py-16 border-y border-marron/10 mt-16 text-center">
+                        <p class="title-font text-5xl italic text-rose">Une énergie qui se savoure.</p>
+                    </div>
+                `
+            },
+            cacao: {
+                title: "Le Cacao Cru : L'Or Noir de nos Gummies",
+                img: "7f0ac084359702ecc3410bdf47c37dd3.jpg",
+                content: `
+                    <h1 class="title-font text-4xl mb-8 italic text-marron">Le Cacao Cru : L'Or Noir de nos Gummies</h1>
+                    <p class="text-lg opacity-70 mb-10 leading-relaxed">Bien plus qu'un simple ingrédient de saveur, le cacao cru est le pilier sensoriel et nutritionnel de l'univers Solergy.</p>
+                    <p>Contrairement au cacao torréfié traditionnellement, le cacao cru n'est jamais chauffé au-delà de 42°C. Ce procédé ancestral permet de conserver l'intégralité des nutriments sensibles à la chaleur, offrant ainsi une densité minérale exceptionnelle.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Une puissance antioxydante préservée</h3>
+                    <p>Le cacao cru est l'un des aliments les plus riches en flavonoïdes au monde. Ces molécules protectrices favorisent la microcirculation et aident à lutter contre le stress oxydatif lié à l'effort physique intense ou à la fatigue mentale.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">L'éclat et la texture</h3>
+                    <p>L'intégration de brisures de cacao à l'intérieur de nos gummies crée un contraste de texture unique : la tendreté de la base végétale rencontre le craquant noble de la fève. C'est cette dualité qui fait de chaque prise un véritable rituel de plaisir.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Un boost naturel de sérotonine</h3>
+                    <p>Riche en tryptophane et en magnésium, le cacao cru agit naturellement sur l'équilibre nerveux. Il offre cette clarté d'esprit et ce sentiment de bien-être immédiat, indispensable pour aborder vos défis quotidiens avec sérénité.</p>
+
+                    <div class="py-16 border-y border-marron/10 mt-16 text-center">
+                        <p class="title-font text-5xl italic text-rose">Savourer l'intensité pure.</p>
+                    </div>
+                `
+            },
+            rituel: {
+                title: "Sérénité Active : L'Art du Mouvement Conscient",
+                img: "Gemini_Generated_Image_4noj8z4noj8z4noj.jpg",
+                content: `
+                    <h1 class="title-font text-4xl mb-8 italic text-marron">Sérénité Active : L'Art du Mouvement Conscient</h1>
+                    <p class="text-lg opacity-70 mb-10 leading-relaxed">Dans un monde qui privilégie souvent la force brute, Solergy propose une autre voie : celle de l'énergie harmonieuse.</p>
+                    <p>La performance ne se résume pas à l'épuisement. Elle réside dans la capacité à préserver son calme intérieur, même au cœur de l'action. C'est ce que nous appelons la Sérénité Active.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Le mouvement comme méditation</h3>
+                    <p>Que ce soit lors d'une séance de yoga, d'un entraînement matinal ou d'une marche en pleine nature, le mouvement conscient permet de reconnecter le corps et l'esprit. Nos alliés nutritionnels sont pensés pour accompagner cette démarche, offrant une énergie diffuse et stable, sans pics de stress.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Ancrer son rituel</h3>
+                    <p>Prendre deux gummies avant une activité n'est pas qu'un geste fonctionnel. C'est un signal que vous envoyez à votre cerveau : le moment de se recentrer est arrivé. Nos actifs anti-stress naturels, comme certains extraits botaniques rares, vous aident à rester focalisé sur l'instant présent.</p>
+                    
+                    <h3 class="title-font text-3xl mt-12 mb-6 italic text-rose">Équilibrer l'effort et le repos</h3>
+                    <p>Nous croyons que la récupération est la clé d'une performance durable. Apprendre à écouter son corps, à ajuster son souffle et à nourrir ses cellules avec pureté est le secret d'un équilibre inébranlable.</p>
+
+                    <div class="py-16 border-y border-marron/10 mt-16 text-center">
+                        <p class="title-font text-5xl italic text-rose">L'énergie qui naît du calme.</p>
+                    </div>
+                `
+            }
+        };
+
+        function showPage(id) {
+            document.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+            const target = document.getElementById(id);
+            if (target) { target.classList.add('active'); window.scrollTo({ top: 0, behavior: 'smooth' }); }
+            document.querySelectorAll('.nav-item').forEach(link => link.classList.remove('active'));
+            const activeLink = document.getElementById('nav-' + id);
+            if (activeLink) activeLink.classList.add('active');
+            if (id !== 'blog') closeArticle();
+        }
+
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                const q = event.target.value.toLowerCase().trim();
+                if (q.includes('barre')) showProductDetail('barres');
+                else if (q.includes('gumm')) showProductDetail('gummies');
+                else if (q.includes('elixir')) showProductDetail('elixirs');
+                event.target.value = ""; event.target.blur();
+            }
+        }
+
+        function showProductDetail(id) {
+            const p = products[id];
+            if (!p) return;
+            const container = document.getElementById('productDetailContent');
+            container.innerHTML = `
+                <div class="col-span-full bg-[var(--kaki)] p-8 md:p-12 rounded-[50px] grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+                    <div class="product-detail-carousel group shadow-xl rounded-[30px]">
+                        <div class="carousel-track" id="detailTrack">
+                            ${p.images.map(img => `<div class="carousel-slide flex items-center justify-center p-8 bg-white rounded-[30px]"><img src="${img}" class="max-w-full max-h-full object-contain rounded-[20px]"></div>`).join('')}
+                        </div>
+                        ${p.images.length > 1 ? `
+                            <button class="carousel-btn left-4 shadow-lg hover:bg-rose-light transition-colors" onclick="moveDetailCarousel(-1, ${p.images.length})">
+                                <i data-lucide="chevron-left" class="w-5 h-5 text-marron"></i>
+                            </button>
+                            <button class="carousel-btn right-4 shadow-lg hover:bg-rose-light transition-colors" onclick="moveDetailCarousel(1, ${p.images.length})">
+                                <i data-lucide="chevron-right" class="w-5 h-5 text-marron"></i>
+                            </button>
+                        ` : ''}
+                    </div>
+                    <div class="space-y-12 lg:pl-6">
+                        <div class="space-y-4">
+                            <span class="text-[11px] tracking-[0.6em] text-white/80 font-light">L'Incontournable</span>
+                            <h1 class="title-font text-6xl italic leading-none text-white">${p.title}</h1>
+                            <p class="text-[10px] font-light opacity-60 italic text-white">${p.subtitle}</p>
+                        </div>
+                        <div class="line-accent ml-0 bg-white/30"></div>
+                        <p class="font-light leading-[2] opacity-80 text-base italic text-white">${p.desc}</p>
+                        <div class="flex items-center space-x-10 pt-6">
+                            <span class="title-font text-4xl italic text-white">${p.price}€</span>
+                            <button onclick="addToCart('${p.title}', ${p.price})" class="btn-solergy border-white text-white hover:bg-white hover:text-marron shadow-lg rounded-full">Ajouter au panier</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            detailCurrentIndex = 0;
+            showPage('product-detail');
+            lucide.createIcons();
+        }
+
+        let detailCurrentIndex = 0;
+        function moveDetailCarousel(dir, total) {
+            const track = document.getElementById('detailTrack');
+            detailCurrentIndex = (detailCurrentIndex + dir + total) % total;
+            track.style.transform = `translateX(-${detailCurrentIndex * 100}%)`;
+        }
+
+        let cart = [];
+        function toggleCart() {
+            document.getElementById('cartPanel').classList.toggle('open');
+            document.getElementById('cartOverlay').classList.toggle('open');
+        }
+        function addToCart(name, price) {
+            const item = cart.find(i => i.name === name);
+            if (item) item.quantity += 1; else cart.push({ name, price, quantity: 1 });
+            updateCartUI(); 
+            toggleCart();
+        }
+        function updateCartUI() {
+            const list = document.getElementById('cartItemsList');
+            const badge = document.getElementById('cartBadge');
+            const totalQty = cart.reduce((acc, i) => acc + i.quantity, 0);
+            
+            badge.textContent = totalQty; 
+            badge.classList.toggle('hidden', totalQty === 0);
+            
+            if (cart.length === 0) {
+                list.innerHTML = `<p class="text-[11px] opacity-30 text-center py-20 uppercase tracking-widest italic">Le panier est vide.</p>`;
+            } else {
+                list.innerHTML = cart.map(i => `<div class="flex justify-between items-center pb-6 border-b border-marron/5"><div><h4 class="title-font text-2xl italic">${i.name}</h4><p class="text-[9px] opacity-30">Quantité: ${i.quantity}</p></div><div>${i.price * i.quantity}€</div></div>`).join('');
+            }
+            
+            const grandTotal = cart.reduce((acc, i) => acc + (i.price * i.quantity), 0);
+            document.getElementById('cartTotal').textContent = `${grandTotal}€`;
+            document.getElementById('checkoutTotal').textContent = `${grandTotal}€`;
+        }
+
+        function finalizeOrder() {
+            alert("Votre commande Maison Solergy a été validée avec succès. Un mail de confirmation vous a été envoyé.");
+            cart = [];
+            updateCartUI();
+            showPage('home');
+        }
+
+        function showArticle(id) {
+            const art = blogArticles[id];
+            if (!art) return;
+            
+            document.getElementById('blogDetailTitle').innerText = art.title;
+            document.getElementById('blogDetailImg').src = art.img;
+            document.getElementById('blogDetailContent').innerHTML = art.content;
+            
+            document.getElementById('blogGrid').classList.add('hidden');
+            document.getElementById('blogDetail').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+        
+        function closeArticle() {
+            document.getElementById('blogDetail').classList.add('hidden');
+            document.getElementById('blogGrid').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+        
+        function toggleReviewModal() { 
+            const m = document.getElementById('reviewModal');
+            m.classList.toggle('hidden'); m.classList.toggle('flex');
+        }
+        
+        let currentRating = 0;
+        function setRating(n) {
+            currentRating = n;
+            document.querySelectorAll('#starSelector i').forEach((s, i) => {
+                if(i < n) s.classList.add('star-active');
+                else s.classList.remove('star-active');
+            });
+        }
+        function submitReview(e) {
+            e.preventDefault();
+            alert("Votre témoignage précieux a été transmis avec soin.");
+            toggleReviewModal();
+            document.getElementById('reviewForm').reset();
+            setRating(0);
+        }
+
+        window.onload = () => { showPage('home'); updateCartUI(); };
+    </script>
+</body>
+</html>
